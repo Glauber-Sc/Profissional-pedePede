@@ -375,25 +375,25 @@ const app = express();
 app.use(json());
 app.use(cors()); // Isso permitirá todas as origens
 
-// // Criando um cliente para conexão com o PostgreSQL
-// const pgClient = new Client({
-//   user: "postgres",
-//   host: "localhost",
-//   database: "pix",
-//   password: "1234",
-//   port: 5432, // Porta padrão do PostgreSQL
-// });
-// pgClient.connect(); // Conectando ao banco de dados
-
-//Criando um cliente para conexão com o PostgreSQL
+// Criando um cliente para conexão com o PostgreSQL
 const pgClient = new Client({
   user: "postgres",
-  host: "postgres.ckymwbkfxdvf.sa-east-1.rds.amazonaws.com",
-  database: "postgres",
-  password: "12341234",
+  host: "localhost",
+  database: "pix",
+  password: "1234",
   port: 5432, // Porta padrão do PostgreSQL
 });
 pgClient.connect(); // Conectando ao banco de dados
+
+// //Criando um cliente para conexão com o PostgreSQL
+// const pgClient = new Client({
+//   user: "postgres",
+//   host: "postgres.ckymwbkfxdvf.sa-east-1.rds.amazonaws.com",
+//   database: "postgres",
+//   password: "12341234",
+//   port: 5432, // Porta padrão do PostgreSQL
+// });
+// pgClient.connect(); // Conectando ao banco de dados
 
 app.set("view engine", "ejs");
 app.set("views", "src/views");
@@ -700,7 +700,7 @@ app.put('/webhook(/pix)?', async (req, res) => {
 
 
 
-app.listen(4000, () => {
+app.listen(4001, () => {
   console.log("running");
 });
 
