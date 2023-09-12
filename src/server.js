@@ -390,7 +390,7 @@ const pgClient = new Client({
   user: "postgres",
   host: "pix.ckymwbkfxdvf.sa-east-1.rds.amazonaws.com",
   database: "postgres",
-  password: "12341234",
+  password: "1234",
   port: 5432, // Porta padrão do PostgreSQL
 });
 pgClient.connect(); // Conectando ao banco de dados
