@@ -375,25 +375,25 @@ const app = express();
 app.use(json());
 app.use(cors()); // Isso permitirá todas as origens
 
-// Criando um cliente para conexão com o PostgreSQL
-const pgClient = new Client({
-  user: "postgres",
-  host: "localhost",
-  database: "pix",
-  password: "1234",
-  port: 5432, // Porta padrão do PostgreSQL
-});
-pgClient.connect(); // Conectando ao banco de dados
-
-//Criando um cliente para conexão com o PostgreSQL
+// // Criando um cliente para conexão com o PostgreSQL
 // const pgClient = new Client({
 //   user: "postgres",
-//   host: "postgres.ckymwbkfxdvf.sa-east-1.rds.amazonaws.com",
-//   database: "postgres",
-//   password: "12341234",
+//   host: "localhost",
+//   database: "pix",
+//   password: "1234",
 //   port: 5432, // Porta padrão do PostgreSQL
 // });
 // pgClient.connect(); // Conectando ao banco de dados
+
+//Criando um cliente para conexão com o PostgreSQL
+const pgClient = new Client({
+  user: "postgres",
+  host: "postgres.ckymwbkfxdvf.sa-east-1.rds.amazonaws.com",
+  database: "postgres",
+  password: "12341234",
+  port: 5432, // Porta padrão do PostgreSQL
+});
+pgClient.connect(); // Conectando ao banco de dados
 
 app.set("view engine", "ejs");
 app.set("views", "src/views");
@@ -481,13 +481,13 @@ app.get("/pix", async (req, res) => {
 
     // Aqui você define o fuso horário do Brasil (Belém, Pará)
     const brasilTimeZone = "America/Belem";
-    
+
     // Converte a data local para a hora do Brasil
     const zonedDate = utcToZonedTime(new Date(formattedDate), brasilTimeZone);
-    
+
     // Formate a data e hora no fuso horário do Brasil
     const formattedDateTime = format(zonedDate, "yyyy-MM-dd HH:mm:ss", { timeZone: brasilTimeZone });
-    
+
     console.log("Data e hora formatadas:", formattedDateTime); // Adicione este log
 
     // Faça uma consulta SQL para buscar as transações com base na data de criação (data_registro)
@@ -513,7 +513,7 @@ app.get("/pix", async (req, res) => {
 //   if (request.socket.authorized) {
 //     try {
 //       const { txid } = request.body; // Supondo que o webhook envie o ID da transação (txid)
-      
+
 //       console.log(`Webhook recebido para txid: ${txid}`);
 
 //       // Realize a verificação do pagamento e atualização do status no banco de dados
@@ -540,7 +540,7 @@ app.get("/pix", async (req, res) => {
 
 
 
- 
+
 app.get("/cobrancas", async (req, res) => {
   const reqGN = await reqGNAlready;
 
@@ -550,7 +550,7 @@ app.get("/cobrancas", async (req, res) => {
 
   //const cobResponse = await reqGN.get(`/v2/cob?inicio=${inicio}&fim=${fim}`);
   const cobResponse = await reqGN.get(`/v2/cob?inicio=2023-07-05T17:35:03.271Z&fim=2023-08-05T17:57:14.859Z`);
-  
+
 
   // Gravando os dados no banco de dados PostgreSQL
   try {
@@ -633,7 +633,7 @@ async function verificarStatus(txid) {
         WHERE txid = $1;
       `;
       await pgClient.query(updateQuery, [txid]);
-      
+
       // Envia uma notificação ao cliente (opcional)
       console.log(`A transação com txid ${txid} foi paga.`);
     } else {
@@ -652,7 +652,7 @@ async function buscarTxidsDoBancoDeDados() {
       FROM transactions
       WHERE status = 'pendente'; -- Ou qualquer critério que você use para determinar quais transações verificar
     `;
-    
+
     const { rows } = await pgClient.query(query);
     return rows.map(row => row.txid);
   } catch (error) {
