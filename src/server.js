@@ -702,7 +702,7 @@ app.put('/webhook(/pix)?', async (req, res) => {
 
 
 
-app.listen(3000, () => {
+app.listen(4000, () => {
   console.log("running");
 });
 
@@ -793,27 +793,9 @@ app.listen(3000, () => {
 // });
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-app.listen(4000, () => {
-  console.log("running");
-});
+//app.listen(4000, () => {
+//  console.log("running");
+//});
 
 
 
