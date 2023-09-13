@@ -375,25 +375,25 @@ const app = express();
 app.use(json());
 app.use(cors()); // Isso permitirá todas as origens
 
-// // Criando um cliente para conexão com o PostgreSQL
-// const pgClient = new Client({
-//   user: "postgres",
-//   host: "localhost",
-//   database: "pix",
-//   password: "1234",
-//   port: 5432, // Porta padrão do PostgreSQL
-// });
-// pgClient.connect(); // Conectando ao banco de dados
-
-//Criando um cliente para conexão com o PostgreSQL
+// Criando um cliente para conexão com o PostgreSQL
 const pgClient = new Client({
   user: "postgres",
-  host: "postgres.ckymwbkfxdvf.sa-east-1.rds.amazonaws.com",
-  database: "postgres",
-  password: "12341234",
+  host: "localhost",
+  database: "pix",
+  password: "1234",
   port: 5432, // Porta padrão do PostgreSQL
 });
 pgClient.connect(); // Conectando ao banco de dados
+
+//Criando um cliente para conexão com o PostgreSQL
+// const pgClient = new Client({
+//   user: "postgres",
+//   host: "postgres.ckymwbkfxdvf.sa-east-1.rds.amazonaws.com",
+//   database: "postgres",
+//   password: "12341234",
+//   port: 5432, // Porta padrão do PostgreSQL
+// });
+// pgClient.connect(); // Conectando ao banco de dados
 
 app.set("view engine", "ejs");
 app.set("views", "src/views");
@@ -548,7 +548,9 @@ app.get("/cobrancas", async (req, res) => {
   const inicio = req.query.inicio; // Obtém o valor do parâmetro de consulta "inicio"
   const fim = req.query.fim; // Obtém o valor do parâmetro de consulta "fim"
 
-  const cobResponse = await reqGN.get(`/v2/cob?inicio=${inicio}&fim=${fim}`);
+  //const cobResponse = await reqGN.get(`/v2/cob?inicio=${inicio}&fim=${fim}`);
+  const cobResponse = await reqGN.get(`/v2/cob?inicio=2023-07-05T17:35:03.271Z&fim=2023-08-05T17:57:14.859Z`);
+  
 
   // Gravando os dados no banco de dados PostgreSQL
   try {
@@ -700,7 +702,7 @@ app.put('/webhook(/pix)?', async (req, res) => {
 
 
 
-app.listen(4002, () => {
+app.listen(4000, () => {
   console.log("running");
 });
 
