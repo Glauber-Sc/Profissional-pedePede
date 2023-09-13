@@ -388,7 +388,7 @@ app.use(cors()); // Isso permitirá todas as origens
 //Criando um cliente para conexão com o PostgreSQL
 const pgClient = new Client({
   user: "postgres",
-  host: "172.31.5.76",
+  host: "18.231.82.230",
   database: "postgres",
   password: "12341234",
   port: 5432, // Porta padrão do PostgreSQL
