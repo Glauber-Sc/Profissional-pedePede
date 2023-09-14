@@ -513,9 +513,9 @@ app.get("/pix", async (req, res) => {
     console.log("Data recebida:", data); // Adicione este log
 
     // Verifica se a data foi fornecida
-    // if (!data) {
-    //   return res.status(400).json({ error: "A data é obrigatória" });
-    // }
+    if (!data) {
+      return res.status(400).json({ error: "A data é obrigatória" });
+    }
 
     // Converte a data para o formato "yyyy-MM-dd"
     const formattedDate = format(new Date(data), "yyyy-MM-dd");
