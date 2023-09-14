@@ -404,48 +404,6 @@ const reqGNAlready = GNRequest({
 });
 
 
-
-
-// app.get("/pix", async (req, res) => {
-//   try {
-  
-//     console.log(req.body);
-//     const reqGN = await reqGNAlready;
-
-//     const endpoint = `${process.env.GN_ENDPOINT}/v2/cob`;
-
-//     const dataCob = {
-//       calendario: {
-//         expiracao: 3600,
-//       },
-  
-//       valor: {
-//         original: "10.00",
-//       },
-//       chave: "f64cf28a-bc46-48c0-b7a8-ef66597707b7",
-//       solicitacaoPagador: "Informe o número ou identificador do pedido.",
-//     };
-//     const cobResponse = await reqGN.post("/v2/cob", dataCob);
-
-//     const qrcodeResponse = await reqGN.get(
-//       `/v2/loc/${cobResponse.data.loc.id}/qrcode`
-//     );
-
-
-//     res.json({
-//       qrcodeImage: qrcodeResponse.data.imagemQrcode,
-//       qrcode: qrcodeResponse.data.qrcode,
-  
-//     });
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).send("Erro interno no servidor");
-//   }
-// });
-
-
-
-
 app.post("/pix", async (req, res) => {
   try {
     const { nome, valor, finalPrice, deliveryTax } = req.body; // Certifique-se de que a propriedade 'valor' está no corpo da requisição
@@ -460,10 +418,10 @@ app.post("/pix", async (req, res) => {
       },
       devedor: {
         cpf: "12345678909",
-        nome: nome,
+        nome: "gggg",
       },
       valor: {
-        original: valor,
+        original: "10.10",
       },
       chave: "f64cf28a-bc46-48c0-b7a8-ef66597707b7",
       solicitacaoPagador: "Informe o número ou identificador do pedido.",
@@ -474,7 +432,7 @@ app.post("/pix", async (req, res) => {
       `/v2/loc/${cobResponse.data.loc.id}/qrcode`
     );
 
-    //Calcula a data e hora de expiração
+    // Calcula a data e hora de expiração
     const expiracaoTimestamp = new Date(
       Date.now() + dataCob.calendario.expiracao * 1000
     );
