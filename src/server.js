@@ -371,7 +371,7 @@ import cron from "node-cron"; // Importe o node-cron para agendar tarefas.
 const { Client } = pkg;
 
 // Lê o certificado SSL a partir do arquivo PEM
-const sslCert = fs.readFileSync('caminho-para-seu-certificado.pem');
+//const sslCert = fs.readFileSync('caminho-para-seu-certificado.pem');
 
 const app = express();
 
