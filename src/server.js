@@ -392,7 +392,7 @@ const pgClient = new Client({
   database: "postgres",
   password: "12341234",
   port: 5432, // Porta padrão do PostgreSQL
-  ssl: true,
+  ssl: false,
 });
 pgClient.connect(); // Conectando ao banco de dados
 
