@@ -366,29 +366,9 @@ import pkg from "pg";
 import { format } from "date-fns";
 import { utcToZonedTime } from "date-fns-tz";
 
-
-
-import { readFileSync } from "fs";
-import { resolve, dirname } from "path";
-import { fileURLToPath } from 'url';
-
-
 import cron from "node-cron"; // Importe o node-cron para agendar tarefas.
 
 const { Client } = pkg;
-
-import dotenv from 'dotenv';
-
-// Convert the URL of the current module file to a filesystem path
-const currentFilePath = fileURLToPath(import.meta.url);
-const currentDirPath = dirname(currentFilePath);
-
-// Load environment variables from .env file using dotenv
-
-dotenv.config({ path: resolve(currentDirPath, '../../.env') });
-
-const sslCert = resolve(currentDirPath, `../../pem/${process.env.GN_CERT}`);
-
 
 const app = express();
 
@@ -412,8 +392,11 @@ const pgClient = new Client({
   database: "postgres",
   password: "12341234",
   port: 5432, // Porta padrão do PostgreSQL
- ssl: {
-    ca: sslCert, // Certificado SSL
+  dialectOptions: {
+    ssl: {
+      require: true, // This will help you. But you will see nwe error
+      rejectUnauthorized: false // This line will fix new error
+    }
   },
 });
 pgClient.connect(); // Conectando ao banco de dados

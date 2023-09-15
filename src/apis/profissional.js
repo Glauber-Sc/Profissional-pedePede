@@ -6,14 +6,12 @@ import { Agent } from "https";
 import express, { json } from "express";
 import cors from "cors";
 
-import dotenv from 'dotenv';
-
 // Convert the URL of the current module file to a filesystem path
 const currentFilePath = fileURLToPath(import.meta.url);
 const currentDirPath = dirname(currentFilePath);
 
 // Load environment variables from .env file using dotenv
-
+import dotenv from 'dotenv';
 dotenv.config({ path: resolve(currentDirPath, '../../.env') });
 
 const certPath = resolve(currentDirPath, `../../certs/${process.env.GN_CERT}`);
