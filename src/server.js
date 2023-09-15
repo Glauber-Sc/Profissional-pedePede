@@ -371,7 +371,7 @@ import cron from "node-cron"; // Importe o node-cron para agendar tarefas.
 const { Client } = pkg;
 
 // Caminho absoluto para o seu certificado SSL
-const caminhoParaCertificado = '../../../pem/se';
+const caminhoParaCertificado = `../../pem/${process.env.GN_RDS}`;
 
 const app = express();
 
@@ -395,11 +395,8 @@ const pgClient = new Client({
   database: "postgres",
   password: "12341234",
   port: 5432, // Porta padrão do PostgreSQL
-  dialectOptions: {
-    ssl: {
-      require: false, // This will help you. But you will see nwe error
-      rejectUnauthorized: false // This line will fix new error
-    }
+  ssl: {
+    ca: caminhoParaCertificado, // Caminho absoluto para o certificado SSL
   },
 });
 pgClient.connect(); // Conectando ao banco de dados
