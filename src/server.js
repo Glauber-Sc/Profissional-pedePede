@@ -396,7 +396,7 @@ const pgClient = new Client({
   password: "12341234",
   port: 5432, // Porta padrão do PostgreSQL
   ssl: {
-    ca: caminhoParaCertificado, // Caminho absoluto para o certificado SSL
+    rejectUnauthorized: false, // Desativa a verificação do certificado
   },
 });
 pgClient.connect(); // Conectando ao banco de dados
