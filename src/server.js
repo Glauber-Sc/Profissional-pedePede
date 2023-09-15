@@ -370,6 +370,9 @@ import cron from "node-cron"; // Importe o node-cron para agendar tarefas.
 
 const { Client } = pkg;
 
+// Lê o certificado SSL a partir do arquivo PEM
+const sslCert = fs.readFileSync('caminho-para-seu-certificado.pem');
+
 const app = express();
 
 app.use(json());
@@ -392,7 +395,9 @@ const pgClient = new Client({
   database: "postgres",
   password: "12341234",
   port: 5432, // Porta padrão do PostgreSQL
-  ssl: true,
+  ssl: {
+    ca: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCQcVxVx+5sJFDiyBMka4C89bohyVNbZ80XnYO9UXeNTtUa9dSJ89vAQhgFmQdnI5x5Ypd7t4x+vzGySTR3BxGAzPqHWc+PpItw9PDXwvaTzGz6lTe4a8+Fc/p0ZaHYdrAmpesMORjAmUW7n3LZJBjc5Q94ycrt1/HEKM4vrTbzBl6jtTEK9VSnyL", // Certificado SSL
+  },
 });
 pgClient.connect(); // Conectando ao banco de dados
 
