@@ -387,9 +387,9 @@ app.use(cors()); // Isso permitirá todas as origens
 
 //Criando um cliente para conexão com o PostgreSQL
 const pgClient = new Client({
-  user: "pedepede",
-  host: " 172.31.5.76",
-  database: "pedepede",
+  user: "postgres",
+  host: "172.31.5.76",
+  database: "postgres",
   password: "12341234",
   port: 5432, // Porta padrão do PostgreSQL
 });
@@ -549,9 +549,7 @@ app.get("/cobrancas", async (req, res) => {
   const fim = req.query.fim; // Obtém o valor do parâmetro de consulta "fim"
 
   //const cobResponse = await reqGN.get(`/v2/cob?inicio=${inicio}&fim=${fim}`);
-  const cobResponse = await reqGN.get(`/v2/cob?inicio=2023-09-03 14:45:09.000Z&fim=2023-09-04 14:45:09.000Z`);
- 
-  
+  const cobResponse = await reqGN.get(`/v2/cob?inicio=2023-07-05T17:35:03.271Z&fim=2023-08-05T17:57:14.859Z`);
 
 
   // Gravando os dados no banco de dados PostgreSQL
