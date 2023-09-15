@@ -549,7 +549,7 @@ app.get("/cobrancas", async (req, res) => {
   const fim = req.query.fim; // Obtém o valor do parâmetro de consulta "fim"
 
   //const cobResponse = await reqGN.get(`/v2/cob?inicio=${inicio}&fim=${fim}`);
-  const cobResponse = await reqGN.get(`/v2/cob?inicio=2023-09-04 14:45:09.000Z&fim=2023-09-04 14:45:09.000Z`);
+  const cobResponse = await reqGN.get(`/v2/cob?inicio=2023-09-03 14:45:09.000Z&fim=2023-09-04 14:45:09.000Z`);
  
   
 
