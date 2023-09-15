@@ -404,7 +404,7 @@ const reqGNAlready = GNRequest({
 });
 
 
-app.get("/pix", async (req, res) => {
+app.post("/pix", async (req, res) => {
   try {
     const { nome, valor, finalPrice, deliveryTax } = req.body; // Certifique-se de que a propriedade 'valor' está no corpo da requisição
     console.log(req.body);
@@ -418,10 +418,10 @@ app.get("/pix", async (req, res) => {
       },
       devedor: {
         cpf: "12345678909",
-        nome: "gggg",
+        nome: nome,
       },
       valor: {
-        original: "10.10",
+        original: valor,
       },
       chave: "f64cf28a-bc46-48c0-b7a8-ef66597707b7",
       solicitacaoPagador: "Informe o número ou identificador do pedido.",
@@ -549,7 +549,9 @@ app.get("/cobrancas", async (req, res) => {
   const fim = req.query.fim; // Obtém o valor do parâmetro de consulta "fim"
 
   //const cobResponse = await reqGN.get(`/v2/cob?inicio=${inicio}&fim=${fim}`);
-  const cobResponse = await reqGN.get(`/v2/cob?inicio=2023-07-05T17:35:03.271Z&fim=2023-08-05T17:57:14.859Z`);
+  const cobResponse = await reqGN.get(`/v2/cob?inicio=2023-09-04 14:45:09.000Z&fim=2023-09-04 14:45:09.000Z`);
+ 
+  
 
 
   // Gravando os dados no banco de dados PostgreSQL
