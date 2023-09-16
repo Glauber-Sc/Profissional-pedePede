@@ -370,9 +370,6 @@ import cron from "node-cron"; // Importe o node-cron para agendar tarefas.
 
 const { Client } = pkg;
 
-// Caminho absoluto para o seu certificado SSL
-const caminhoParaCertificado = `../../pem/${process.env.GN_RDS}`;
-
 const app = express();
 
 app.use(json());
