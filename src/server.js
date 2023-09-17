@@ -409,7 +409,7 @@ const reqGNAlready = GNRequest({
 
 app.post("/pix", async (req, res) => {
   try {
-    const { nome, valor, finalPrice, deliveryTax } = req.body; // Certifique-se de que a propriedade 'valor' está no corpo da requisição
+    const { nome, valor, finalPrice, deliveryTax } = req.body; //Certifique-se de que a propriedade 'valor' está no corpo da requisição
     console.log(req.body);
     const reqGN = await reqGNAlready;
 
@@ -614,94 +614,80 @@ app.get("/cobrancas", async (req, res) => {
 
 
 
-// app.post("/webhook(/pix)?", async (req, res) => {
-//   console.log(req.body)
-//   res.send('200');
-// });
-
-
-// Função para verificar o status da transação
-async function verificarStatus(txid) {
-  const reqGN = await reqGNAlready;
-  const endpoint = `${process.env.GN_ENDPOINT}/v2/cob`;
-
-  try {
-    const response = await reqGN.get(`${endpoint}/${txid}`);
-
-    if (response.data.status === 'pago') {
-      // Atualize o status no seu banco de dados para "pago"
-      const updateQuery = `
-        UPDATE transactions
-        SET status = 'pago'
-        WHERE txid = $1;
-      `;
-      await pgClient.query(updateQuery, [txid]);
-
-      // Envia uma notificação ao cliente (opcional)
-      console.log(`A transação com txid ${txid} foi paga.`);
-    } else {
-      console.log(`A transação com txid ${txid} ainda não foi paga.`);
-    }
-  } catch (error) {
-    console.error(`Erro ao verificar status da transação com txid ${txid}:`, error);
-  }
-}
-
-
-async function buscarTxidsDoBancoDeDados() {
-  try {
-    const query = `
-      SELECT txid
-      FROM transactions
-      WHERE status = 'pendente'; -- Ou qualquer critério que você use para determinar quais transações verificar
-    `;
-
-    const { rows } = await pgClient.query(query);
-    return rows.map(row => row.txid);
-  } catch (error) {
-    console.error('Erro ao buscar txids do banco de dados:', error);
-    return [];
-  }
-}
-
-
-// Chame essa função periodicamente para verificar o status
-const tempoVerificacao = 60 * 1000; // 1 minuto em milissegundos
-
-setInterval(async () => {
-  const txids = await buscarTxidsDoBancoDeDados();
-
-  for (const txid of txids) {
-    verificarStatus(txid);
-  }
-}, tempoVerificacao);
-
-
-
-// Rota para lidar com notificações do webhook
-app.put('/webhook(/pix)?', async (req, res) => {
-  try {
-    const { txid, status } = req.body; // Suponha que a notificação contenha o txid e o status
-
-    // Verifique se o status é "pago"
-    if (status === 'pago') {
-      // Atualize o status no seu banco de dados para "pago"
-      const updateQuery = `
-        UPDATE transactions
-        SET status = 'pago'
-        WHERE txid = $1;
-      `;
-      await pgClient.query(updateQuery, [txid]);
-
-      console.log(`Status atualizado para 'pago' para txid: ${txid}`);
-    }
-
-    res.status(200).end();
-  } catch (error) {
-    console.error(error);
-    res.status(500).end();
-  }
+app.post("/webhook(/pix)?", async (req, res) => {
+  console.log(req.body)
+  res.send('200');
 });
+
+
+// // Função para verificar o status da transação
+// async function verificarStatus(txid) {
+//   const reqGN = await reqGNAlready;
+//   const endpoint = `${process.env.GN_ENDPOINT}/v2/cob`;
+
+//   try {
+//     const response = await reqGN.get(`${endpoint}/${txid}`);
+
+//     if (response.data.status === 'pago') {
+//       // Atualize o status no seu banco de dados para "pago"
+//       const updateQuery = `
+//         UPDATE transactions
+//         SET status = 'pago'
+//         WHERE txid = $1;
+//       `;
+//       await pgClient.query(updateQuery, [txid]);
+
+//       // Envia uma notificação ao cliente (opcional)
+//       console.log(`A transação com txid ${txid} foi paga.`);
+//     } else {
+//       console.log(`A transação com txid ${txid} ainda não foi paga.`);
+//     }
+//   } catch (error) {
+//     console.error(`Erro ao verificar status da transação com txid ${txid}:`, error);
+//   }
+// }
+
+
+
+
+
+// // Chame essa função periodicamente para verificar o status
+// const tempoVerificacao = 60 * 1000; // 1 minuto em milissegundos
+
+// setInterval(async () => {
+//   const txids = await buscarTxidsDoBancoDeDados();
+
+//   for (const txid of txids) {
+//     verificarStatus(txid);
+//   }
+// }, tempoVerificacao);
+
+
+
+// // Rota para lidar com notificações do webhook
+// app.put('/webhook(/pix)?', async (req, res) => {
+//   try {
+//     const { txid, status } = req.body; // Suponha que a notificação contenha o txid e o status
+
+//     // Verifique se o status é "pago"
+//     if (status === 'pago') {
+//       // Atualize o status no seu banco de dados para "pago"
+//       const updateQuery = `
+//         UPDATE transactions
+//         SET status = 'pago'
+//         WHERE txid = $1;
+//       `;
+//       await pgClient.query(updateQuery, [txid]);
+
+//       console.log(`Status atualizado para 'pago' para txid: ${txid}`);
+//     }
+
+//     res.status(200).end();
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).end();
+//   }
+// });
 
 
 
