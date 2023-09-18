@@ -11,10 +11,10 @@ const currentFilePath = fileURLToPath(import.meta.url);
 const currentDirPath = dirname(currentFilePath);
 
 // Load environment variables from .env file using dotenv
-import dotenv from 'dotenv';
-dotenv.config({ path: resolve(currentDirPath, '../../.env') });
-
+// import dotenv from 'dotenv';
+// dotenv.config({ path: resolve(currentDirPath, '../../.env') });
 const certPath = resolve(currentDirPath, `../../certs/${process.env.GN_CERT}`);
+
 const cert = readFileSync(certPath);
 
 const agent = new Agent({
