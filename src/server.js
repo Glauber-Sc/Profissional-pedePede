@@ -43,7 +43,7 @@ pgClient.connect(); // Conectando ao banco de dados
 app.set("view engine", "ejs");
 app.set("views", "src/views");
 
-const reqGNAlready = GNRequest({
+let reqGNAlready = GNRequest({
   clientID: process.env.GN_CLIENT_ID,
   clientSecret: process.env.GN_CLIENT_SECRET,
 });
@@ -59,7 +59,9 @@ app.post("/pix", async (req, res) => {
     //const reqGN = await reqGNAlready;
     const endpoint = `${process.env.GN_ENDPOINT}/v2/cob`;
 
-    const reqGN = await GNRequest()
+   // const reqGN = await GNRequest()
+
+   const reqGN = await reqGNAlready;
 
     const dataCob = {
       calendario: {
@@ -111,48 +113,48 @@ app.post("/pix", async (req, res) => {
   }
 });
 
-// app.get("/pix", async (req, res) => {
-//   try {
-//     const { data } = req.query; // Obtém a data da consulta de parâmetro de consulta
-//     console.log("Data recebida:", data); // Adicione este log
+app.get("/pix", async (req, res) => {
+  try {
+    const { data } = req.query; // Obtém a data da consulta de parâmetro de consulta
+    console.log("Data recebida:", data); // Adicione este log
 
-//     // Verifica se a data foi fornecida
-//     if (!data) {
-//       return res.status(400).json({ error: "A data é obrigatória" });
-//     }
+    // Verifica se a data foi fornecida
+    if (!data) {
+      return res.status(400).json({ error: "A data é obrigatória" });
+    }
 
-//     // Converte a data para o formato "yyyy-MM-dd"
-//     const formattedDate = format(new Date(data), "yyyy-MM-dd");
-//     console.log("Data formatada:", formattedDate); // Adicione este log
+    // Converte a data para o formato "yyyy-MM-dd"
+    const formattedDate = format(new Date(data), "yyyy-MM-dd");
+    console.log("Data formatada:", formattedDate); // Adicione este log
 
-//     // Aqui você define o fuso horário do Brasil (Belém, Pará)
-//     const brasilTimeZone = "America/Belem";
+    // Aqui você define o fuso horário do Brasil (Belém, Pará)
+    const brasilTimeZone = "America/Belem";
 
-//     // Converte a data local para a hora do Brasil
-//     const zonedDate = utcToZonedTime(new Date(formattedDate), brasilTimeZone);
+    // Converte a data local para a hora do Brasil
+    const zonedDate = utcToZonedTime(new Date(formattedDate), brasilTimeZone);
 
-//     // Formate a data e hora no fuso horário do Brasil
-//     const formattedDateTime = format(zonedDate, "yyyy-MM-dd HH:mm:ss", {
-//       timeZone: brasilTimeZone,
-//     });
+    // Formate a data e hora no fuso horário do Brasil
+    const formattedDateTime = format(zonedDate, "yyyy-MM-dd HH:mm:ss", {
+      timeZone: brasilTimeZone,
+    });
 
-//     console.log("Data e hora formatadas:", formattedDateTime); // Adicione este log
+    console.log("Data e hora formatadas:", formattedDateTime); // Adicione este log
 
-//     // Faça uma consulta SQL para buscar as transações com base na data de criação (data_registro)
-//     const query = `
-//       SELECT id, txid, nome, valor, qrcode, expiracao
-//       FROM transactions
-//       WHERE DATE(data_registro) = $1;
-//     `;
-//     const { rows } = await pgClient.query(query, [formattedDate]);
-//     console.log("Registros encontrados:", rows); // Adicione este log
+    // Faça uma consulta SQL para buscar as transações com base na data de criação (data_registro)
+    const query = `
+      SELECT id, txid, nome, valor, qrcode, expiracao
+      FROM transactions
+      WHERE DATE(data_registro) = $1;
+    `;
+    const { rows } = await pgClient.query(query, [formattedDate]);
+    console.log("Registros encontrados:", rows); // Adicione este log
 
-//     res.json(rows); // Retorna as transações encontradas como uma resposta JSON
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).send("Erro interno no servidor");
-//   }
-// });
+    res.json(rows); // Retorna as transações encontradas como uma resposta JSON
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Erro interno no servidor");
+  }
+});
 
 
 
