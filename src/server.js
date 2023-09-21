@@ -43,7 +43,7 @@ pgClient.connect(); // Conectando ao banco de dados
 app.set("view engine", "ejs");
 app.set("views", "src/views");
 
-let reqGNAlready = GNRequest({
+const reqGNAlready = GNRequest({
   clientID: process.env.GN_CLIENT_ID,
   clientSecret: process.env.GN_CLIENT_SECRET,
 });
@@ -59,9 +59,7 @@ app.post("/pix", async (req, res) => {
     //const reqGN = await reqGNAlready;
     const endpoint = `${process.env.GN_ENDPOINT}/v2/cob`;
 
-   // const reqGN = await GNRequest()
-
-   const reqGN = await reqGNAlready;
+    const reqGN = await GNRequest()
 
     const dataCob = {
       calendario: {
