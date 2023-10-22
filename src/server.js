@@ -27,6 +27,17 @@ app.use(cors()); // Isso permitirá todas as origens
 // });
 // pgClient.connect(); // Conectando ao banco de dados
 
+// const pgClientCodeburguer = new Client({
+//   user: "postgres",
+//   host: "localhost",
+//   database: "codeburguer",
+//   password: "1234",
+//   port: 5432,
+// });
+// pgClientCodeburguer.connect();
+
+
+
 //Criando um cliente para conexão com o PostgreSQL
 const pgClient = new Client({
   user: "postgres",
@@ -39,6 +50,22 @@ const pgClient = new Client({
   },
 });
 pgClient.connect(); // Conectando ao banco de dados
+
+
+//Criando um cliente para conexão com o PostgreSQL
+const pgClientCodeburguer = new Client({
+  user: "codeburguer",
+  host: "codeburguer.ckymwbkfxdvf.sa-east-1.rds.amazonaws.com",
+  database: "codeburguer",
+  password: "12341234",
+  port: 5432, // Porta padrão do PostgreSQL
+  ssl: {
+    rejectUnauthorized: false, // Desativa a verificação do certificado
+  },
+});
+pgClientCodeburguer.connect(); // Conectando ao banco de dados
+
+
 
 app.set("view engine", "ejs");
 app.set("views", "src/views");
@@ -183,78 +210,123 @@ app.get("/pix", async (req, res) => {
 //   }
 // });
 
-app.get("/cobrancas", async (req, res) => {
-  const reqGN = await reqGNAlready;
+// app.get("/cobrancas", async (req, res) => {
+//   const reqGN = await reqGNAlready;
 
-  const inicio = req.query.inicio; // Obtém o valor do parâmetro de consulta "inicio"
-  const fim = req.query.fim; // Obtém o valor do parâmetro de consulta "fim"
+//   const inicio = req.query.inicio; // Obtém o valor do parâmetro de consulta "inicio"
+//   const fim = req.query.fim; // Obtém o valor do parâmetro de consulta "fim"
 
-  //const cobResponse = await reqGN.get(`/v2/cob?inicio=${inicio}&fim=${fim}`);
-  const cobResponse = await reqGN.get(
-    `/v2/cob?inicio=2023-07-05T17:35:03.271Z&fim=2023-08-05T17:57:14.859Z`
-  );
+//   //const cobResponse = await reqGN.get(`/v2/cob?inicio=${inicio}&fim=${fim}`);
+//   const cobResponse = await reqGN.get(
+//     `/v2/cob?inicio=2023-07-05T17:35:03.271Z&fim=2023-08-05T17:57:14.859Z`
+//   );
 
-  // Gravando os dados no banco de dados PostgreSQL
+//   // Gravando os dados no banco de dados PostgreSQL
+//   try {
+//     // Gravando os dados no banco de dados PostgreSQL
+//     for (const cobData of cobResponse.data.cobs) {
+//       const query = `
+//         INSERT INTO cobs (
+//           criacao,
+//           expiracao,
+//           txid,
+//           revisao,
+//           loc_id,
+//           loc_location,
+//           loc_tipoCob,
+//           loc_criacao,
+//           status,
+//           devedor_cpf,
+//           devedor_nome,
+//           valor_original,
+//           chave,
+//           solicitacaoPagador
+//         )
+//         VALUES (
+//           $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14
+//         );`;
+
+//       const values = [
+//         cobData.calendario.criacao,
+//         cobData.calendario.expiracao,
+//         cobData.txid,
+//         cobData.revisao,
+//         cobData.loc.id,
+//         cobData.loc.location,
+//         cobData.loc.tipoCob,
+//         cobData.loc.criacao,
+//         cobData.status,
+//         cobData.devedor.cpf,
+//         cobData.devedor.nome,
+//         cobData.valor.original,
+//         cobData.chave,
+//         cobData.solicitacaoPagador,
+//       ];
+
+//       await pgClient.query(query, values);
+//     }
+//     res.send(cobResponse.data);
+//     // res.send("Dados gravados no banco de dados.");
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).send("Erro interno no servidor");
+//   }
+
+//   //  res.send(cobResponse.data);
+
+//   // const jsonFormatted = JSON.stringify(cobResponse.data, null, 2);
+//   // console.log(jsonFormatted);
+// });
+
+
+
+// app.post("/webhook(/pix)?", async (req, res) => {
+//   console.log(req.body);
+//   res.send("200");
+// });
+
+
+
+// app.post('/webhook(/pix)?', async (req, res) => {
+//   try {
+//     const { user_id } = req.body; // Suponha que a notificação contenha o txid
+
+//     // Atualize o status_payment no seu banco de dados para true
+//     const updateQuery = `
+//       UPDATE orders
+//       SET status_payment = true
+//       WHERE user_id = $1;
+//     `;
+//     await pgClientCodeburguer.query(updateQuery, [user_id]);
+
+//     console.log(`Status atualizado para 'true' para txid: ${user_id}`);
+
+//     res.status(200).end();
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).end();
+//   }
+// });
+
+app.post('/webhook(/pix)?', async (req, res) => {
   try {
-    // Gravando os dados no banco de dados PostgreSQL
-    for (const cobData of cobResponse.data.cobs) {
-      const query = `
-        INSERT INTO cobs (
-          criacao,
-          expiracao,
-          txid,
-          revisao,
-          loc_id,
-          loc_location,
-          loc_tipoCob,
-          loc_criacao,
-          status,
-          devedor_cpf,
-          devedor_nome,
-          valor_original,
-          chave,
-          solicitacaoPagador
-        )
-        VALUES (
-          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14
-        );`;
+    // Atualize o status_payment em todos os registros da tabela orders para true
+    const updateQuery = `
+      UPDATE orders
+      SET status_payment = true;
+    `;
 
-      const values = [
-        cobData.calendario.criacao,
-        cobData.calendario.expiracao,
-        cobData.txid,
-        cobData.revisao,
-        cobData.loc.id,
-        cobData.loc.location,
-        cobData.loc.tipoCob,
-        cobData.loc.criacao,
-        cobData.status,
-        cobData.devedor.cpf,
-        cobData.devedor.nome,
-        cobData.valor.original,
-        cobData.chave,
-        cobData.solicitacaoPagador,
-      ];
+    await pgClientCodeburguer.query(updateQuery);
 
-      await pgClient.query(query, values);
-    }
-    res.send(cobResponse.data);
-    // res.send("Dados gravados no banco de dados.");
+    console.log(`Status atualizado para 'true' em todos os registros da tabela orders.`, req.body);
+    res.status(200).end();
   } catch (error) {
     console.error(error);
-    res.status(500).send("Erro interno no servidor");
+    res.status(500).end();
   }
-
-  //  res.send(cobResponse.data);
-
-  // const jsonFormatted = JSON.stringify(cobResponse.data, null, 2);
-  // console.log(jsonFormatted);
 });
 
-app.post("/webhook(/pix)?", async (req, res) => {
-  console.log(req.body);
-  res.send("200");
-});
+
 
 // // Função para verificar o status da transação
 // async function verificarStatus(txid) {
