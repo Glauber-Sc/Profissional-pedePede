@@ -287,44 +287,46 @@ app.get("/pix", async (req, res) => {
 
 
 
-// app.post('/webhook(/pix)?', async (req, res) => {
-//   try {
-//     const { user_id } = req.body; // Suponha que a notificação contenha o txid
-
-//     // Atualize o status_payment no seu banco de dados para true
-//     const updateQuery = `
-//       UPDATE orders
-//       SET status_payment = true
-//       WHERE user_id = $1;
-//     `;
-//     await pgClientCodeburguer.query(updateQuery, [user_id]);
-
-//     console.log(`Status atualizado para 'true' para txid: ${user_id}`);
-
-//     res.status(200).end();
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).end();
-//   }
-// });
-
 app.post('/webhook(/pix)?', async (req, res) => {
   try {
-    // Atualize o status_payment em todos os registros da tabela orders para true
+    const { txid } = req.body; // Suponha que a notificação contenha o txid
+
+    // Atualize o status_payment no seu banco de dados para true
     const updateQuery = `
       UPDATE orders
-      SET status_payment = true;
+      SET status_payment = true
+      WHERE txid = $1;
     `;
+    await pgClientCodeburguer.query(updateQuery, [txid]);
 
-    await pgClientCodeburguer.query(updateQuery);
+    console.log(`Status atualizado para 'true' para txid: ${txid}`);
 
-    console.log(`Status atualizado para 'true' em todos os registros da tabela orders.`, req.body);
     res.status(200).end();
   } catch (error) {
     console.error(error);
     res.status(500).end();
   }
 });
+
+
+
+// app.post('/webhook(/pix)?', async (req, res) => {
+//   try {
+//     // Atualize o status_payment em todos os registros da tabela orders para true
+//     const updateQuery = `
+//       UPDATE orders
+//       SET status_payment = true;
+//     `;
+
+//     await pgClientCodeburguer.query(updateQuery);
+
+//     console.log(`Status atualizado para 'true' em todos os registros da tabela orders.`, req.body);
+//     res.status(200).end();
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).end();
+//   }
+// });
 
 
 
