@@ -106,8 +106,8 @@ app.post("/pix", async (req, res) => {
     );
 
     const query = `
-      INSERT INTO transactions (txid, nome, valor, qrcode, expiracao)
-      VALUES ($1, $2, $3, $4, $5);`;
+      INSERT INTO transactions (txid, nome, valor, qrcode, expiracao, order_id)
+      VALUES ($1, $2, $3, $4, $5, $6);`;
 
     const values = [
       cobResponse.data.txid,
@@ -115,6 +115,7 @@ app.post("/pix", async (req, res) => {
       valor,
       qrcodeResponse.data.qrcode,
       expiracaoTimestamp,
+      cobResponse.data.order_id
     ];
 
     await pgClientCodeburguer.query(query, values);
@@ -159,7 +160,7 @@ app.get("/pix", async (req, res) => {
 
     // Faça uma consulta SQL para buscar as transações com base na data de criação (data_registro)
     const query = `
-      SELECT id, txid, nome, valor, qrcode, expiracao
+      SELECT id, txid, nome, valor, qrcode, expiracao, order_id
       FROM transactions
       WHERE DATE(data_registro) = $1;
     `;
