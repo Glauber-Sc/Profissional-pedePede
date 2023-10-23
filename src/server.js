@@ -198,11 +198,11 @@ app.get("/pix", async (req, res) => {
 
 app.post("/webhook(/pix)?", async (req, res) => {
   try {
-    const { txid } = req.body; // Suponha que a notificação contenha o txid
+    //const { txid } = req.body; // Suponha que a notificação contenha o txid
 
     // Primeiro, verifique se o txid existe na tabela 'transactions'
     const checkQuery = "SELECT txid FROM transactions WHERE txid = $1";
-    const { rows } = await pgClient.query(checkQuery, [txid]);
+    const { rows } = await pgClient.query(checkQuery);
     //await pgClient.connect();
 
     if (rows.length > 0) {
