@@ -1,5 +1,5 @@
 import express, { json } from "express";
-import {GNRequest} from "./apis/profissional.js";
+import { GNRequest } from "./apis/profissional.js";
 import cors from "cors";
 import pkg from "pg";
 
@@ -36,8 +36,6 @@ app.use(cors()); // Isso permitirá todas as origens
 // });
 // pgClientCodeburguer.connect();
 
-
-
 //Criando um cliente para conexão com o PostgreSQL
 const pgClient = new Client({
   user: "postgres",
@@ -50,7 +48,6 @@ const pgClient = new Client({
   },
 });
 pgClient.connect(); // Conectando ao banco de dados
-
 
 //Criando um cliente para conexão com o PostgreSQL
 const pgClientCodeburguer = new Client({
@@ -65,8 +62,6 @@ const pgClientCodeburguer = new Client({
 });
 pgClientCodeburguer.connect(); // Conectando ao banco de dados
 
-
-
 app.set("view engine", "ejs");
 app.set("views", "src/views");
 
@@ -75,18 +70,15 @@ const reqGNAlready = GNRequest({
   clientSecret: process.env.GN_CLIENT_SECRET,
 });
 
-
-
 app.post("/pix", async (req, res) => {
   try {
     const { nome, valor, finalPrice, deliveryTax } = req.body; //Certifique-se de que a propriedade 'valor' está no corpo da requisição
     console.log(req.body);
 
-
     //const reqGN = await reqGNAlready;
     const endpoint = `${process.env.GN_ENDPOINT}/v2/cob`;
 
-    const reqGN = await GNRequest()
+    const reqGN = await GNRequest();
 
     const dataCob = {
       calendario: {
@@ -181,126 +173,22 @@ app.get("/pix", async (req, res) => {
   }
 });
 
-
-
-// app.post("/webhook/pix", async (request, response) => {
-//   if (request.socket.authorized) {
-//     try {
-//       const { txid } = request.body; // Supondo que o webhook envie o ID da transação (txid)
-
-//       console.log(`Webhook recebido para txid: ${txid}`);
-
-//       // Realize a verificação do pagamento e atualização do status no banco de dados
-//       const updateQuery = `
-//         UPDATE transactions
-//         SET status = 'pago'
-//         WHERE txid = $1;
-//       `;
-//       await pgClient.query(updateQuery, [txid]);
-
-//       console.log(`Status atualizado para 'pago' para txid: ${txid}`);
-
-//       response.status(200).end();
-//     } catch (error) {
-//       console.error(error);
-//       response.status(500).end();
-//     }
-//   } else {
-//     response.status(401).end();
-//   }
-// });
-
-// app.get("/cobrancas", async (req, res) => {
-//   const reqGN = await reqGNAlready;
-
-//   const inicio = req.query.inicio; // Obtém o valor do parâmetro de consulta "inicio"
-//   const fim = req.query.fim; // Obtém o valor do parâmetro de consulta "fim"
-
-//   //const cobResponse = await reqGN.get(`/v2/cob?inicio=${inicio}&fim=${fim}`);
-//   const cobResponse = await reqGN.get(
-//     `/v2/cob?inicio=2023-07-05T17:35:03.271Z&fim=2023-08-05T17:57:14.859Z`
-//   );
-
-//   // Gravando os dados no banco de dados PostgreSQL
-//   try {
-//     // Gravando os dados no banco de dados PostgreSQL
-//     for (const cobData of cobResponse.data.cobs) {
-//       const query = `
-//         INSERT INTO cobs (
-//           criacao,
-//           expiracao,
-//           txid,
-//           revisao,
-//           loc_id,
-//           loc_location,
-//           loc_tipoCob,
-//           loc_criacao,
-//           status,
-//           devedor_cpf,
-//           devedor_nome,
-//           valor_original,
-//           chave,
-//           solicitacaoPagador
-//         )
-//         VALUES (
-//           $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14
-//         );`;
-
-//       const values = [
-//         cobData.calendario.criacao,
-//         cobData.calendario.expiracao,
-//         cobData.txid,
-//         cobData.revisao,
-//         cobData.loc.id,
-//         cobData.loc.location,
-//         cobData.loc.tipoCob,
-//         cobData.loc.criacao,
-//         cobData.status,
-//         cobData.devedor.cpf,
-//         cobData.devedor.nome,
-//         cobData.valor.original,
-//         cobData.chave,
-//         cobData.solicitacaoPagador,
-//       ];
-
-//       await pgClient.query(query, values);
-//     }
-//     res.send(cobResponse.data);
-//     // res.send("Dados gravados no banco de dados.");
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).send("Erro interno no servidor");
-//   }
-
-//   //  res.send(cobResponse.data);
-
-//   // const jsonFormatted = JSON.stringify(cobResponse.data, null, 2);
-//   // console.log(jsonFormatted);
-// });
-
-
-
 // app.post("/webhook(/pix)?", async (req, res) => {
 //   console.log(req.body);
 //   res.send("200");
 // });
 
-
-
 // app.post('/webhook(/pix)?', async (req, res) => {
 //   try {
-//     const { user_id } = req.body; // Suponha que a notificação contenha o txid
-
-//     // Atualize o status_payment no seu banco de dados para true
+//     // Atualize o status_payment em todos os registros da tabela orders para true
 //     const updateQuery = `
 //       UPDATE orders
-//       SET status_payment = true
-//       WHERE user_id = $1;
+//       SET status_payment = true;
 //     `;
-//     await pgClientCodeburguer.query(updateQuery, [user_id]);
 
-//     console.log(`Status atualizado para 'true' para txid: ${user_id}`);
+//     await pgClientCodeburguer.query(updateQuery);
 
+//     console.log(`Status atualizado para 'true' em todos os registros da tabela orders.`, req.body);
 //     res.status(200).end();
 //   } catch (error) {
 //     console.error(error);
@@ -308,90 +196,38 @@ app.get("/pix", async (req, res) => {
 //   }
 // });
 
-
-
-app.post('/webhook(/pix)?', async (req, res) => {
+app.post("/webhook(/pix)?", async (req, res) => {
   try {
-    // Atualize o status_payment em todos os registros da tabela orders para true
-    const updateQuery = `
-      UPDATE orders
-      SET status_payment = true;
-    `;
+    const { txid } = req.body; // Suponha que a notificação contenha o txid
 
-    await pgClientCodeburguer.query(updateQuery);
+    // Primeiro, verifique se o txid existe na tabela 'transactions'
+    const checkQuery = "SELECT txid FROM transactions WHERE txid = $1";
+    const { rows } = await pgClient.query(checkQuery, [txid]);
+    //await pgClient.connect();
 
-    console.log(`Status atualizado para 'true' em todos os registros da tabela orders.`, req.body);
-    res.status(200).end();
+    if (rows.length > 0) {
+      // Se o txid existe na tabela 'transactions', atualize o 'status_payment' para 'true' no registro atual da tabela 'orders'
+      const updateQuery = `
+        UPDATE orders
+        SET status_payment = true
+        WHERE id = (SELECT id FROM orders WHERE status_payment = false LIMIT 1);
+      `;
+
+      await pgClientCodeburguer.query(updateQuery);
+
+      console.log(`Status atualizado para 'true' para txid: ${txid}`);
+
+      res.status(200).end();
+    } else {
+      // Se o txid não existe na tabela 'transactions'
+      console.error(`txid não encontrado na tabela "transactions".`);
+      res.status(400).end();
+    }
   } catch (error) {
     console.error(error);
     res.status(500).end();
   }
 });
-
-
-
-// // Função para verificar o status da transação
-// async function verificarStatus(txid) {
-//   const reqGN = await reqGNAlready;
-//   const endpoint = `${process.env.GN_ENDPOINT}/v2/cob`;
-
-//   try {
-//     const response = await reqGN.get(`${endpoint}/${txid}`);
-
-//     if (response.data.status === 'pago') {
-//       // Atualize o status no seu banco de dados para "pago"
-//       const updateQuery = `
-//         UPDATE transactions
-//         SET status = 'pago'
-//         WHERE txid = $1;
-//       `;
-//       await pgClient.query(updateQuery, [txid]);
-
-//       // Envia uma notificação ao cliente (opcional)
-//       console.log(`A transação com txid ${txid} foi paga.`);
-//     } else {
-//       console.log(`A transação com txid ${txid} ainda não foi paga.`);
-//     }
-//   } catch (error) {
-//     console.error(`Erro ao verificar status da transação com txid ${txid}:`, error);
-//   }
-// }
-
-// // Chame essa função periodicamente para verificar o status
-// const tempoVerificacao = 60 * 1000; // 1 minuto em milissegundos
-
-// setInterval(async () => {
-//   const txids = await buscarTxidsDoBancoDeDados();
-
-//   for (const txid of txids) {
-//     verificarStatus(txid);
-//   }
-// }, tempoVerificacao);
-
-// // Rota para lidar com notificações do webhook
-// app.put('/webhook(/pix)?', async (req, res) => {
-//   try {
-//     const { txid, status } = req.body; // Suponha que a notificação contenha o txid e o status
-
-//     // Verifique se o status é "pago"
-//     if (status === 'pago') {
-//       // Atualize o status no seu banco de dados para "pago"
-//       const updateQuery = `
-//         UPDATE transactions
-//         SET status = 'pago'
-//         WHERE txid = $1;
-//       `;
-//       await pgClient.query(updateQuery, [txid]);
-
-//       console.log(`Status atualizado para 'pago' para txid: ${txid}`);
-//     }
-
-//     res.status(200).end();
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).end();
-//   }
-// });
 
 app.listen(4000, () => {
   console.log("running");
