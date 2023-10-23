@@ -1,5 +1,5 @@
 import express, { json } from "express";
-import {GNRequest} from "./apis/profissional.js";
+import { GNRequest } from "./apis/profissional.js";
 import cors from "cors";
 import pkg from "pg";
 
@@ -36,8 +36,6 @@ app.use(cors()); // Isso permitirá todas as origens
 // });
 // pgClientCodeburguer.connect();
 
-
-
 //Criando um cliente para conexão com o PostgreSQL
 const pgClient = new Client({
   user: "postgres",
@@ -50,7 +48,6 @@ const pgClient = new Client({
   },
 });
 pgClient.connect(); // Conectando ao banco de dados
-
 
 //Criando um cliente para conexão com o PostgreSQL
 const pgClientCodeburguer = new Client({
@@ -65,8 +62,6 @@ const pgClientCodeburguer = new Client({
 });
 pgClientCodeburguer.connect(); // Conectando ao banco de dados
 
-
-
 app.set("view engine", "ejs");
 app.set("views", "src/views");
 
@@ -75,18 +70,15 @@ const reqGNAlready = GNRequest({
   clientSecret: process.env.GN_CLIENT_SECRET,
 });
 
-
-
 app.post("/pix", async (req, res) => {
   try {
     const { nome, valor, finalPrice, deliveryTax } = req.body; //Certifique-se de que a propriedade 'valor' está no corpo da requisição
     console.log(req.body);
 
-
     //const reqGN = await reqGNAlready;
     const endpoint = `${process.env.GN_ENDPOINT}/v2/cob`;
 
-    const reqGN = await GNRequest()
+    const reqGN = await GNRequest();
 
     const dataCob = {
       calendario: {
@@ -129,9 +121,9 @@ app.post("/pix", async (req, res) => {
 
     // Adicione o txid à tabela orders
     const ordersQuery = `
-      INSERT INTO public.orders (txid)
-      VALUES ($1);
-    `;
+    UPDATE public.orders
+    SET txid = $1;
+  `;
 
     const ordersValues = [cobResponse.data.txid];
 
@@ -190,8 +182,6 @@ app.get("/pix", async (req, res) => {
     res.status(500).send("Erro interno no servidor");
   }
 });
-
-
 
 // app.post("/webhook/pix", async (request, response) => {
 //   if (request.socket.authorized) {
@@ -288,16 +278,12 @@ app.get("/pix", async (req, res) => {
 //   // console.log(jsonFormatted);
 // });
 
-
-
 // app.post("/webhook(/pix)?", async (req, res) => {
 //   console.log(req.body);
 //   res.send("200");
 // });
 
-
-
-app.post('/webhook(/pix)?', async (req, res) => {
+app.post("/webhook(/pix)?", async (req, res) => {
   try {
     const { txid } = req.body; // Suponha que a notificação contenha o txid
 
@@ -318,8 +304,6 @@ app.post('/webhook(/pix)?', async (req, res) => {
   }
 });
 
-
-
 // app.post('/webhook(/pix)?', async (req, res) => {
 //   try {
 //     // Atualize o status_payment em todos os registros da tabela orders para true
@@ -337,8 +321,6 @@ app.post('/webhook(/pix)?', async (req, res) => {
 //     res.status(500).end();
 //   }
 // });
-
-
 
 // // Função para verificar o status da transação
 // async function verificarStatus(txid) {
