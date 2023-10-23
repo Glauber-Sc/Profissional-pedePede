@@ -107,7 +107,8 @@ app.post("/pix", async (req, res) => {
 
     const query = `
       INSERT INTO transactions (txid, nome, valor, qrcode, expiracao)
-      VALUES ($1, $2, $3, $4, $5);`;
+      VALUES ($1, $2, $3, $4, $5);
+      RETURNING id;`; // Incluímos 'RETURNING id' para obter o ID da transação inserida;
 
     const values = [
       cobResponse.data.txid,
@@ -117,7 +118,22 @@ app.post("/pix", async (req, res) => {
       expiracaoTimestamp,
     ];
 
-    await pgClientCodeburguer.query(query, values);
+    // await pgClientCodeburguer.query(query, values);
+
+    const { rows } = await pgClientCodeburguer.query(query, values);
+    // Agora que temos o ID da transação, podemos atualizar a tabela 'orders' com o 'txid'
+    const transactionId = rows[0].id;
+
+    const updateOrderQuery = `
+        UPDATE orders
+        SET txid = $1
+        WHERE id = $2;
+      `;
+
+    await pgClientCodeburguer.query(updateOrderQuery, [
+      cobResponse.data.txid,
+      transactionId,
+    ]);
 
     res.json({
       qrcodeImage: qrcodeResponse.data.imagemQrcode,
@@ -196,33 +212,31 @@ app.get("/pix", async (req, res) => {
 //   }
 // });
 
-
-app.post('/webhook(/pix)?', async (req, res) => {
+app.post("/webhook(/pix)?", async (req, res) => {
   try {
     const { pix } = req.body;
 
+    // Verifique se há notificações no campo "pix"
     if (pix && pix.length > 0) {
       for (const notification of pix) {
         const { txid } = notification;
-        console.log("Webhook received txid:", txid);
+        console.log("Webhook received txid:", txid); // Registre o txid recebido
 
-        // Consulte o pedido associado a este txid
-        const findOrderQuery = "SELECT order_id FROM transactions WHERE txid = $1";
-        const { rows } = await pgClientCodeburguer.query(findOrderQuery, [txid]);
+        // Verifique se o txid existe na tabela 'transactions'
+        const checkQuery = "SELECT txid FROM transactions WHERE txid = $1";
+        const { rows } = await pgClientCodeburguer.query(checkQuery, [txid]);
+        console.log("Webhook received rows:", rows); // Registre o txid recebido
 
         if (rows.length > 0) {
-          const order_id = rows[0].order_id;
-
-          // Atualize o status de pagamento para 'true' no pedido associado
-          const updateOrderQuery = `
+          // Se o txid existe na tabela 'transactions', atualize o 'status_payment' para 'true' na tabela 'orders'
+          const updateQuery = `
             UPDATE orders
             SET status_payment = true
-            WHERE id = $1;
           `;
 
-          await pgClientCodeburguer.query(updateOrderQuery, [order_id]);
+          await pgClientCodeburguer.query(updateQuery, [txid]);
 
-          console.log(`Status de pagamento atualizado para 'true' para txid: ${txid}`);
+          console.log(`Status atualizado para 'true' para txid: ${txid}`);
         } else {
           console.error(`txid não encontrado na tabela "transactions".`);
         }
@@ -235,9 +249,6 @@ app.post('/webhook(/pix)?', async (req, res) => {
     res.status(500).end();
   }
 });
-
-
-
 
 app.listen(4000, () => {
   console.log("running");
