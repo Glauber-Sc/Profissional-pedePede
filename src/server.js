@@ -10,8 +10,6 @@ import { utcToZonedTime } from "date-fns-tz";
 
 import cron from "node-cron"; // Importe o node-cron para agendar tarefas.
 
-import axios from "axios";
-
 const { Client } = pkg;
 
 const app = express();
@@ -121,25 +119,6 @@ app.post("/pix", async (req, res) => {
 
     await pgClientCodeburguer.query(query, values);
 
-       // Faça uma chamada HTTP para buscar os pedidos no primeiro backend
-       const ordersFromFirstBackend = await axios.get('https://pedepede.fun/orders');
-       const orders = ordersFromFirstBackend.data;
-   
-       // Encontre o pedido correspondente com base no pedidoId
-       const matchingOrder = orders.find(order => order.id === pedidoId);
-   
-       if (matchingOrder) {
-         // Atualize a tabela 'orders' com o txid e outras informações, usando matchingOrder
-         const updateQuery = `
-           UPDATE orders
-           SET txid = $1
-           WHERE id = $2;`;
-   
-         const updateValues = [cobResponse.data.txid, matchingOrder.id];
-   
-         await pgClientCodeburguer.query(updateQuery, updateValues);
-       }
-
     res.json({
       qrcodeImage: qrcodeResponse.data.imagemQrcode,
       qrcode: qrcodeResponse.data.qrcode,
@@ -238,6 +217,7 @@ app.post('/webhook(/pix)?', async (req, res) => {
           const updateQuery = `
             UPDATE orders
             SET status_payment = true
+
           `;
 
           await pgClientCodeburguer.query(updateQuery, [txid]);
