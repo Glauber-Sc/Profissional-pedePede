@@ -202,7 +202,7 @@ app.post("/webhook(/pix)?", async (req, res) => {
 
     // Primeiro, verifique se o txid existe na tabela 'transactions'
     const checkQuery = "SELECT txid FROM transactions WHERE txid = $1";
-    const { rows } = await pgClient.query(checkQuery, [txid]);
+    const { rows } = await pgClientCodeburguer.query(checkQuery, [txid]);
   //  await pgClient.connect();
 
     if (rows.length > 0) {
