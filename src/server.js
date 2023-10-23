@@ -36,18 +36,18 @@ app.use(cors()); // Isso permitirá todas as origens
 // });
 // pgClientCodeburguer.connect();
 
-//Criando um cliente para conexão com o PostgreSQL
-const pgClient = new Client({
-  user: "postgres",
-  host: "postgres.ckymwbkfxdvf.sa-east-1.rds.amazonaws.com",
-  database: "postgres",
-  password: "12341234",
-  port: 5432, // Porta padrão do PostgreSQL
-  ssl: {
-    rejectUnauthorized: false, // Desativa a verificação do certificado
-  },
-});
-pgClient.connect(); // Conectando ao banco de dados
+// //Criando um cliente para conexão com o PostgreSQL
+// const pgClient = new Client({
+//   user: "postgres",
+//   host: "postgres.ckymwbkfxdvf.sa-east-1.rds.amazonaws.com",
+//   database: "postgres",
+//   password: "12341234",
+//   port: 5432, // Porta padrão do PostgreSQL
+//   ssl: {
+//     rejectUnauthorized: false, // Desativa a verificação do certificado
+//   },
+// });
+// pgClient.connect(); // Conectando ao banco de dados
 
 //Criando um cliente para conexão com o PostgreSQL
 const pgClientCodeburguer = new Client({
@@ -117,7 +117,7 @@ app.post("/pix", async (req, res) => {
       expiracaoTimestamp,
     ];
 
-    await pgClient.query(query, values);
+    await pgClientCodeburguer.query(query, values);
 
     res.json({
       qrcodeImage: qrcodeResponse.data.imagemQrcode,
@@ -163,7 +163,7 @@ app.get("/pix", async (req, res) => {
       FROM transactions
       WHERE DATE(data_registro) = $1;
     `;
-    const { rows } = await pgClient.query(query, [formattedDate]);
+    const { rows } = await pgClientCodeburguer.query(query, [formattedDate]);
     console.log("Registros encontrados:", rows); // Adicione este log
 
     res.json(rows); // Retorna as transações encontradas como uma resposta JSON
@@ -196,38 +196,38 @@ app.get("/pix", async (req, res) => {
 //   }
 // });
 
-app.post("/webhook(/pix)?", async (req, res) => {
-  try {
-    //const { txid } = req.body; // Suponha que a notificação contenha o txid
+// app.post("/webhook(/pix)?", async (req, res) => {
+//   try {
+//     const { txid } = req.body; // Suponha que a notificação contenha o txid
 
-    // Primeiro, verifique se o txid existe na tabela 'transactions'
-    const checkQuery = "SELECT txid FROM transactions WHERE txid = $1";
-    const { rows } = await pgClient.query(checkQuery);
-    //await pgClient.connect();
+//     // Primeiro, verifique se o txid existe na tabela 'transactions'
+//     const checkQuery = "SELECT txid FROM transactions WHERE txid = $1";
+//     const { rows } = await pgClient.query(checkQuery, [txid]);
+//   //  await pgClient.connect();
 
-    if (rows.length > 0) {
-      // Se o txid existe na tabela 'transactions', atualize o 'status_payment' para 'true' no registro atual da tabela 'orders'
-      const updateQuery = `
-        UPDATE orders
-        SET status_payment = true
-        WHERE id = (SELECT id FROM orders WHERE status_payment = false LIMIT 1);
-      `;
+//     if (rows.length > 0) {
+//       // Se o txid existe na tabela 'transactions', atualize o 'status_payment' para 'true' no registro atual da tabela 'orders'
+//       const updateQuery = `
+//         UPDATE orders
+//         SET status_payment = true
+//         WHERE id = (SELECT id FROM orders WHERE status_payment = false LIMIT 1);
+//       `;
 
-      await pgClientCodeburguer.query(updateQuery);
+//       await pgClientCodeburguer.query(updateQuery);
 
-      console.log(`Status atualizado para 'true' para txid: ${txid}`);
+//       console.log(`Status atualizado para 'true' para txid: ${txid}`);
 
-      res.status(200).end();
-    } else {
-      // Se o txid não existe na tabela 'transactions'
-      console.error(`txid não encontrado na tabela "transactions".`);
-      res.status(400).end();
-    }
-  } catch (error) {
-    console.error(error);
-    res.status(500).end();
-  }
-});
+//       res.status(200).end();
+//     } else {
+//       // Se o txid não existe na tabela 'transactions'
+//       console.error(`txid não encontrado na tabela "transactions".`);
+//       res.status(400).end();
+//     }
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).end();
+//   }
+// });
 
 app.listen(4000, () => {
   console.log("running");
