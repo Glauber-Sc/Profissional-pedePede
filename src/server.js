@@ -127,6 +127,16 @@ app.post("/pix", async (req, res) => {
 
     await pgClient.query(query, values);
 
+    // Adicione o txid à tabela orders
+    const ordersQuery = `
+      INSERT INTO public.orders (txid)
+      VALUES ($1);
+    `;
+
+    const ordersValues = [cobResponse.data.txid];
+
+    await pgClientCodeburguer.query(ordersQuery, ordersValues);
+
     res.json({
       qrcodeImage: qrcodeResponse.data.imagemQrcode,
       qrcode: qrcodeResponse.data.qrcode,
