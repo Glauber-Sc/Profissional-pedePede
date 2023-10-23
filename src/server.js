@@ -291,22 +291,33 @@ app.post('/webhook(/pix)?', async (req, res) => {
   try {
     const { txid } = req.body; // Suponha que a notificação contenha o txid
 
-    // Atualize o status_payment no seu banco de dados para true
-    const updateQuery = `
-      UPDATE orders
-      SET status_payment = true
-      WHERE txid = $1;
-    `;
-    await pgClientCodeburguer.query(updateQuery, [txid]);
+    // Conecte-se ao banco de dados da tabela "transactions" (pgClient) para verificar o "txid".
+    const query = 'SELECT txid FROM transactions WHERE txid = $1';
+    const { rows } = await pgClient.query(query, [txid]);
 
-    console.log(`Status atualizado para 'true' para txid: ${txid}`);
+    if (rows.length > 0) {
+      // O "txid" foi encontrado na tabela "transactions", atualize o status_payment na tabela "orders".
+      const updateQuery = `
+        UPDATE orders
+        SET status_payment = true
+        WHERE user_id = (SELECT user_id FROM transactions WHERE txid = $1);
+      `;
+      await pgClientCodeburguer.query(updateQuery, [txid]);
 
-    res.status(200).end();
+      console.log(`Status atualizado para 'true' para txid: ${txid}`);
+
+      res.status(200).end();
+    } else {
+      // O "txid" não foi encontrado na tabela "transactions", retorne um erro.
+      console.error(`txid não encontrado na tabela "transactions".`);
+      res.status(400).end();
+    }
   } catch (error) {
     console.error(error);
     res.status(500).end();
   }
 });
+
 
 
 
