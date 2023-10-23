@@ -105,10 +105,9 @@ app.post("/pix", async (req, res) => {
       Date.now() + dataCob.calendario.expiracao * 1000
     );
 
-    const insertTransactionQuery  = `
+    const query = `
       INSERT INTO transactions (txid, nome, valor, qrcode, expiracao)
-      VALUES ($1, $2, $3, $4, $5);
-      RETURNING id;`; // Incluímos 'RETURNING id' para obter o ID da transação inserida;
+      VALUES ($1, $2, $3, $4, $5);`; // Incluímos 'RETURNING id' para obter o ID da transação inserida;
 
     const values = [
       cobResponse.data.txid,
@@ -120,7 +119,7 @@ app.post("/pix", async (req, res) => {
 
     // await pgClientCodeburguer.query(query, values);
 
-    const { rows } = await pgClientCodeburguer.query(insertTransactionQuery , values);
+    const { rows } = await pgClientCodeburguer.query(query, values);
     // Agora que temos o ID da transação, podemos atualizar a tabela 'orders' com o 'txid'
     const transactionId = rows[0].id;
 
