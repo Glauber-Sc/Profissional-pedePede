@@ -124,10 +124,8 @@ app.post("/pix", async (req, res) => {
     UPDATE public.orders
     SET txid = $1
   `;
+    await pgClientCodeburguer.query(ordersQuery, cobResponse.data.txid);
 
-    const ordersValues = [cobResponse.data.txid];
-
-    await pgClientCodeburguer.query(ordersQuery, ordersValues);
 
     res.json({
       qrcodeImage: qrcodeResponse.data.imagemQrcode,
