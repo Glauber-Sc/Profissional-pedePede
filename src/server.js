@@ -209,21 +209,15 @@ app.post('/webhook(/pix)?', async (req, res) => {
 
         // Verifique se o txid existe na tabela 'transactions'
         const checkQuery = "SELECT txid FROM transactions WHERE txid = $1";
-        console.log("AAAAAAAAAA:", checkQuery); // Registre o txid recebido
         const { rows } = await pgClientCodeburguer.query(checkQuery, [txid]);
+        console.log("Webhook received rows:", rows); // Registre o txid recebido
 
         if (rows.length > 0) {
           // Se o txid existe na tabela 'transactions', atualize o 'status_payment' para 'true' no registro atual da tabela 'orders'
           const updateQuery = `
-          UPDATE public.orders
-          SET status_payment = true
-          WHERE id = (
-            SELECT o.id
-            FROM public.orders o
-            JOIN public.order_items oi ON o.id = oi.order_id
-            WHERE oi.txid = $1
-          );
-        `;
+            UPDATE orders
+            SET status_payment = true
+          `;
 
           await pgClientCodeburguer.query(updateQuery, [txid]);
 
