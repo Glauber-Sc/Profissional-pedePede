@@ -200,6 +200,9 @@ app.post("/webhook(/pix)?", async (req, res) => {
   try {
     const { txid } = req.body; // Suponha que a notificação contenha o txid
 
+    console.log("Webhook received txid:", txid); // Adicione esta linha para registrar o txid recebido
+
+
     // Primeiro, verifique se o txid existe na tabela 'transactions'
     const checkQuery = "SELECT txid FROM transactions WHERE txid = $1";
     const { rows } = await pgClientCodeburguer.query(checkQuery, [txid]);
