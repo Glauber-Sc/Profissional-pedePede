@@ -126,7 +126,7 @@ app.post("/pix", async (req, res) => {
     WHERE id = $2;
   `;
 
-    const ordersValues = [cobResponse.data.txid];
+    const ordersValues = [cobResponse.data.txid, id];
 
     await pgClientCodeburguer.query(ordersQuery, ordersValues);
 
