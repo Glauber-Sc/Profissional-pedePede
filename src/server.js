@@ -200,7 +200,7 @@ app.get("/pix", async (req, res) => {
 app.post('/webhook(/pix)?', async (req, res) => {
   try {
     const { pix } = req.body;
-    
+
     // Verifique se há notificações no campo "pix"
     if (pix && pix.length > 0) {
       for (const notification of pix) {
@@ -213,10 +213,15 @@ app.post('/webhook(/pix)?', async (req, res) => {
         console.log("Webhook received rows:", rows); // Registre o txid recebido
 
         if (rows.length > 0) {
-          // Se o txid existe na tabela 'transactions', atualize o 'status_payment' para 'true' no registro atual da tabela 'orders'
+          // Se o txid existe na tabela 'transactions', atualize o 'status_payment' para 'true' na tabela 'orders'
           const updateQuery = `
             UPDATE orders
             SET status_payment = true
+            WHERE id IN (
+              SELECT order_id
+              FROM order_items
+              WHERE txid = $1
+            );
           `;
 
           await pgClientCodeburguer.query(updateQuery, [txid]);
@@ -234,6 +239,7 @@ app.post('/webhook(/pix)?', async (req, res) => {
     res.status(500).end();
   }
 });
+
 
 
 app.listen(4000, () => {
