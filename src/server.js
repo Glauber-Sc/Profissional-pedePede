@@ -123,7 +123,6 @@ app.post("/pix", async (req, res) => {
     const ordersQuery = `
     UPDATE public.orders
     SET txid = $1
-    WHERE created_at = (SELECT MAX(created_at) FROM public.orders);    
   `;
 
     const ordersValues = [cobResponse.data.txid];
