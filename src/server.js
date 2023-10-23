@@ -122,7 +122,8 @@ app.post("/pix", async (req, res) => {
     // Adicione o txid à tabela orders
     const ordersQuery = `
     UPDATE public.orders
-    SET txid = $1;
+    SET txid = $1
+    WHERE id = $2;
   `;
 
     const ordersValues = [cobResponse.data.txid];
