@@ -173,10 +173,10 @@ app.get("/pix", async (req, res) => {
   }
 });
 
-app.post("/webhook(/pix)?", async (req, res) => {
-  console.log(req.body);
-  res.send("200");
-});
+// app.post("/webhook(/pix)?", async (req, res) => {
+//   console.log(req.body);
+//   res.send("200");
+// });
 
 // app.post('/webhook(/pix)?', async (req, res) => {
 //   try {
@@ -196,41 +196,45 @@ app.post("/webhook(/pix)?", async (req, res) => {
 //   }
 // });
 
-// app.post("/webhook(/pix)?", async (req, res) => {
-//   try {
-//     const { txid } = req.body; // Suponha que a notificação contenha o txid
 
-//     console.log("Webhook received txid:", txid); // Adicione esta linha para registrar o txid recebido
+app.post('/webhook(/pix)?', async (req, res) => {
+  try {
+    const { pix } = req.body;
+    
+    // Verifique se há notificações no campo "pix"
+    if (pix && pix.length > 0) {
+      for (const notification of pix) {
+        const { txid } = notification;
+        console.log("Webhook received txid:", txid); // Registre o txid recebido
 
+        // Verifique se o txid existe na tabela 'transactions'
+        const checkQuery = "SELECT txid FROM transactions WHERE txid = $1";
+        const { rows } = await pgClientCodeburguer.query(checkQuery, [txid]);
 
-//     // Primeiro, verifique se o txid existe na tabela 'transactions'
-//     const checkQuery = "SELECT txid FROM transactions WHERE txid = $1";
-//     const { rows } = await pgClientCodeburguer.query(checkQuery, [txid]);
-//   //  await pgClient.connect();
+        if (rows.length > 0) {
+          // Se o txid existe na tabela 'transactions', atualize o 'status_payment' para 'true' no registro atual da tabela 'orders'
+          const updateQuery = `
+            UPDATE orders
+            SET status_payment = true
+            WHERE id = (SELECT order_id FROM order_items WHERE txid = $1);
+          `;
 
-//     if (rows.length > 0) {
-//       // Se o txid existe na tabela 'transactions', atualize o 'status_payment' para 'true' no registro atual da tabela 'orders'
-//       const updateQuery = `
-//         UPDATE orders
-//         SET status_payment = true
-//         WHERE id = (SELECT id FROM orders WHERE status_payment = false LIMIT 1);
-//       `;
+          await pgClientCodeburguer.query(updateQuery, [txid]);
 
-//       await pgClientCodeburguer.query(updateQuery);
+          console.log(`Status atualizado para 'true' para txid: ${txid}`);
+        } else {
+          console.error(`txid não encontrado na tabela "transactions".`);
+        }
+      }
+    }
 
-//       console.log(`Status atualizado para 'true' para txid: ${txid}`);
+    res.status(200).end();
+  } catch (error) {
+    console.error(error);
+    res.status(500).end();
+  }
+});
 
-//       res.status(200).end();
-//     } else {
-//       // Se o txid não existe na tabela 'transactions'
-//       console.error(`txid não encontrado na tabela "transactions".`);
-//       res.status(400).end();
-//     }
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).end();
-//   }
-// });
 
 app.listen(4000, () => {
   console.log("running");
