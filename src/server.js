@@ -1,5 +1,5 @@
 import express, { json } from "express";
-import { GNRequest } from "./apis/profissional.js";
+import {GNRequest} from "./apis/profissional.js";
 import cors from "cors";
 import pkg from "pg";
 
@@ -36,6 +36,8 @@ app.use(cors()); // Isso permitirá todas as origens
 // });
 // pgClientCodeburguer.connect();
 
+
+
 //Criando um cliente para conexão com o PostgreSQL
 const pgClient = new Client({
   user: "postgres",
@@ -48,6 +50,7 @@ const pgClient = new Client({
   },
 });
 pgClient.connect(); // Conectando ao banco de dados
+
 
 //Criando um cliente para conexão com o PostgreSQL
 const pgClientCodeburguer = new Client({
@@ -62,6 +65,8 @@ const pgClientCodeburguer = new Client({
 });
 pgClientCodeburguer.connect(); // Conectando ao banco de dados
 
+
+
 app.set("view engine", "ejs");
 app.set("views", "src/views");
 
@@ -70,15 +75,18 @@ const reqGNAlready = GNRequest({
   clientSecret: process.env.GN_CLIENT_SECRET,
 });
 
+
+
 app.post("/pix", async (req, res) => {
   try {
     const { nome, valor, finalPrice, deliveryTax } = req.body; //Certifique-se de que a propriedade 'valor' está no corpo da requisição
     console.log(req.body);
 
+
     //const reqGN = await reqGNAlready;
     const endpoint = `${process.env.GN_ENDPOINT}/v2/cob`;
 
-    const reqGN = await GNRequest();
+    const reqGN = await GNRequest()
 
     const dataCob = {
       calendario: {
@@ -118,14 +126,6 @@ app.post("/pix", async (req, res) => {
     ];
 
     await pgClient.query(query, values);
-
-    // Adicione o txid à tabela orders
-    const ordersQuery = `
-    UPDATE public.orders
-    SET txid = $1
-  `;
-    await pgClientCodeburguer.query(ordersQuery, [cobResponse.data.txid]);
-
 
     res.json({
       qrcodeImage: qrcodeResponse.data.imagemQrcode,
@@ -180,6 +180,8 @@ app.get("/pix", async (req, res) => {
     res.status(500).send("Erro interno no servidor");
   }
 });
+
+
 
 // app.post("/webhook/pix", async (request, response) => {
 //   if (request.socket.authorized) {
@@ -276,25 +278,49 @@ app.get("/pix", async (req, res) => {
 //   // console.log(jsonFormatted);
 // });
 
+
+
 // app.post("/webhook(/pix)?", async (req, res) => {
 //   console.log(req.body);
 //   res.send("200");
 // });
 
-app.post("/webhook(/pix)?", async (req, res) => {
-  try {
-    const { txid } = req.body; // Suponha que a notificação contenha o txid
 
-    // Atualize o status_payment no seu banco de dados para true
+
+// app.post('/webhook(/pix)?', async (req, res) => {
+//   try {
+//     const { user_id } = req.body; // Suponha que a notificação contenha o txid
+
+//     // Atualize o status_payment no seu banco de dados para true
+//     const updateQuery = `
+//       UPDATE orders
+//       SET status_payment = true
+//       WHERE user_id = $1;
+//     `;
+//     await pgClientCodeburguer.query(updateQuery, [user_id]);
+
+//     console.log(`Status atualizado para 'true' para txid: ${user_id}`);
+
+//     res.status(200).end();
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).end();
+//   }
+// });
+
+
+
+app.post('/webhook(/pix)?', async (req, res) => {
+  try {
+    // Atualize o status_payment em todos os registros da tabela orders para true
     const updateQuery = `
       UPDATE orders
-      SET status_payment = true
-      WHERE txid = $1;
+      SET status_payment = true;
     `;
-    await pgClientCodeburguer.query(updateQuery, [txid]);
 
-    console.log(`Status atualizado para 'true' para txid: ${txid}`);
+    await pgClientCodeburguer.query(updateQuery);
 
+    console.log(`Status atualizado para 'true' em todos os registros da tabela orders.`, req.body);
     res.status(200).end();
   } catch (error) {
     console.error(error);
@@ -302,23 +328,7 @@ app.post("/webhook(/pix)?", async (req, res) => {
   }
 });
 
-// app.post('/webhook(/pix)?', async (req, res) => {
-//   try {
-//     // Atualize o status_payment em todos os registros da tabela orders para true
-//     const updateQuery = `
-//       UPDATE orders
-//       SET status_payment = true;
-//     `;
 
-//     await pgClientCodeburguer.query(updateQuery);
-
-//     console.log(`Status atualizado para 'true' em todos os registros da tabela orders.`, req.body);
-//     res.status(200).end();
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).end();
-//   }
-// });
 
 // // Função para verificar o status da transação
 // async function verificarStatus(txid) {
