@@ -123,10 +123,9 @@ app.post("/pix", async (req, res) => {
     const ordersQuery = `
     UPDATE public.orders
     SET txid = $1
-    WHERE id = $2;
   `;
 
-    const ordersValues = [cobResponse.data.txid, id];
+    const ordersValues = [cobResponse.data.txid];
 
     await pgClientCodeburguer.query(ordersQuery, ordersValues);
 
