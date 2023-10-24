@@ -232,25 +232,31 @@ app.post("/webhook(/pix)?", async (req, res) => {
 // });
 
 
-app.post('/webhook(/pix)?', async (req, res) => {
-  try {
-    const txid = req.body;
-
-
+app.post("/webhook/pix", async (req, res) => {
+  if (req.body && req.body.txid) {
+    const { txid } = req.body;
+    console.log(`Webhook received for txid: ${txid}`);
+    
+    try {
+   
       const updateQuery = `
         UPDATE orders
         SET status_payment = true
+        WHERE txid = $1;
       `;
-
-      const result = await pgClientCodeburguer.query(updateQuery, [txid]);
-      console.log(`Status atualizado para 'true' para txid: ${txid}`);
-
-    
+      await pgClientCodeburguer.query(updateQuery, [txid]);
+      
+      console.log(`Status updated to 'true' for txid: ${txid}`);
+    } catch (error) {
+      console.error("Error updating payment status:", error);
+      // Lidar com o erro ou registrá-lo para depuração
+      res.status(500).end();
+    }
 
     res.status(200).end();
-  } catch (error) {
-    console.error(error);
-    res.status(500).end();
+  } else {
+    // Dados inválidos ou ausentes na solicitação do webhook
+    res.status(400).end();
   }
 });
 
