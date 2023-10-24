@@ -234,11 +234,8 @@ app.post("/webhook(/pix)?", async (req, res) => {
 
 app.post('/webhook(/pix)?', async (req, res) => {
   try {
-    const { pix } = req.body;
+    const txid = req.body;
 
-    for (const notification of pix) {
-      const { txid } = notification;
-      console.log("Webhook received txid:", txid);
 
       const updateQuery = `
         UPDATE orders
@@ -248,8 +245,8 @@ app.post('/webhook(/pix)?', async (req, res) => {
 
       const result = await pgClientCodeburguer.query(updateQuery, [txid]);
       console.log(`Status atualizado para 'true' para txid: ${txid}`);
-      console.log("Update result:", result.rows);
-    }
+
+    
 
     res.status(200).end();
   } catch (error) {
