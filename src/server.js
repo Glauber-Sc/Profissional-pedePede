@@ -236,21 +236,15 @@ app.get("/pix", async (req, res) => {
 
 app.post('/webhook(/pix)?', async (req, res) => {
   try {
-    const { txid } = req.body;
-
-    if (!txid) {
-      return res.status(400).json({ error: "O campo 'txid' é obrigatório." });
-    }
-
+    // Atualize o status_payment em todos os registros da tabela orders para true
     const updateQuery = `
       UPDATE orders
-      SET status_payment = true
-      WHERE txid = $1;
+      SET status_payment = true;
     `;
 
-    await pgClientCodeburguer.query(updateQuery, [txid]);
+    await pgClientCodeburguer.query(updateQuery);
 
-    console.log(`Status atualizado para 'true' em todos os registros da tabela orders com txid: ${txid}`);
+    console.log(`Status atualizado para 'true' em todos os registros da tabela orders.`);
 
     res.status(200).end();
   } catch (error) {
@@ -258,7 +252,6 @@ app.post('/webhook(/pix)?', async (req, res) => {
     res.status(500).end();
   }
 });
-
 
 
 
