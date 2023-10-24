@@ -80,7 +80,7 @@ const reqGNAlready = GNRequest({
 app.post("/pix", async (req, res) => {
   try {
     const { nome, valor, finalPrice, deliveryTax } = req.body; //Certifique-se de que a propriedade 'valor' está no corpo da requisição
-    console.log(req.body);
+    console.log("AAAAAAAAA", req.body);
 
 
     //const reqGN = await reqGNAlready;
