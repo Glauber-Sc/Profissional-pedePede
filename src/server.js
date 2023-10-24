@@ -240,7 +240,6 @@ app.post('/webhook(/pix)?', async (req, res) => {
       const updateQuery = `
         UPDATE orders
         SET status_payment = true
-        WHERE txid = $1;
       `;
 
       const result = await pgClientCodeburguer.query(updateQuery, [txid]);
