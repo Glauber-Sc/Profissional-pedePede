@@ -236,21 +236,19 @@ app.post('/webhook(/pix)?', async (req, res) => {
   try {
     const { pix } = req.body;
 
-    if (pix && pix.length > 0) {
-      for (const notification of pix) {
-        const { txid } = notification;
-        console.log("Webhook received txid:", txid);
+    for (const notification of pix) {
+      const { txid } = notification;
+      console.log("Webhook received txid:", txid);
 
-        const updateQuery = `
-          UPDATE orders
-          SET status_payment = true
-          WHERE txid = $1;
-        `;
+      const updateQuery = `
+        UPDATE orders
+        SET status_payment = true
+        WHERE txid = $1;
+      `;
 
-        const result = await pgClientCodeburguer.query(updateQuery, [txid]);
-        console.log(`Status atualizado para 'true' para txid: ${txid}`);
-        console.log("Update result:", result.rows);
-      }
+      const result = await pgClientCodeburguer.query(updateQuery, [txid]);
+      console.log(`Status atualizado para 'true' para txid: ${txid}`);
+      console.log("Update result:", result.rows);
     }
 
     res.status(200).end();
