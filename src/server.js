@@ -236,15 +236,18 @@ app.get("/pix", async (req, res) => {
 
 app.post('/webhook(/pix)?', async (req, res) => {
   try {
-    // Atualize o status_payment em todos os registros da tabela orders para true
+    const { txid } = req.body; // Suponha que o txid da transação seja enviado no corpo da solicitação POST
+
+    // Atualize o status_payment no registro da tabela orders correspondente ao txid atual
     const updateQuery = `
       UPDATE orders
-      SET status_payment = true;
+      SET status_payment = true
+      WHERE txid = $1;
     `;
 
-    await pgClientCodeburguer.query(updateQuery);
+    await pgClientCodeburguer.query(updateQuery, [txid]);
 
-    console.log(`Status atualizado para 'true' em todos os registros da tabela orders.`);
+    console.log(`Status atualizado para 'true' para txid: ${txid}`);
 
     res.status(200).end();
   } catch (error) {
