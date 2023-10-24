@@ -232,18 +232,19 @@ app.post("/webhook(/pix)?", async (req, res) => {
 // });
 
 
+//  WHERE txid = $1;
+
 app.post('/webhook(/pix)?', async (req, res) => {
   try {
-    const { txid } = req.body; // Suponha que a notificação contenha o txid
-
-    // Atualize o status_payment no seu banco de dados para true
+    // Atualize o status_payment em todos os registros da tabela orders para true
     const updateQuery = `
       UPDATE orders
-      SET status_payment = true
+      SET status_payment = true;
     `;
-    await pgClientCodeburguer.query(updateQuery, [txid]);
 
-    console.log(`Status atualizado para 'true' para txid: ${txid}`);
+    await pgClientCodeburguer.query(updateQuery);
+
+    console.log(`Status atualizado para 'true' em todos os registros da tabela orders.`);
 
     res.status(200).end();
   } catch (error) {
