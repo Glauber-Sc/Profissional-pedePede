@@ -239,7 +239,7 @@ app.post('/webhook(/pix)?', async (req, res) => {
     // Atualize o status_payment em todos os registros da tabela orders para true
     const updateQuery = `
       UPDATE orders
-      SET status_payment = true;
+      SET status_payment = true
       WHERE txid = $1;
     `;
 
