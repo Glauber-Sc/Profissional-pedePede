@@ -185,10 +185,10 @@ app.get("/pix", async (req, res) => {
 
 
 
-app.post("/webhook(/pix)?", async (req, res) => {
-  console.log(req.body);
-  res.send("200");
-});
+// app.post("/webhook(/pix)?", async (req, res) => {
+//   console.log(req.body);
+//   res.send("200");
+// });
 
 
 
@@ -232,7 +232,7 @@ app.post("/webhook(/pix)?", async (req, res) => {
 // });
 
 
-//  WHERE txid = $1;
+
 
 app.post('/webhook(/pix)?', async (req, res) => {
   try {
@@ -240,6 +240,7 @@ app.post('/webhook(/pix)?', async (req, res) => {
     const updateQuery = `
       UPDATE orders
       SET status_payment = true;
+      WHERE txid = $1;
     `;
 
     await pgClientCodeburguer.query(updateQuery);
