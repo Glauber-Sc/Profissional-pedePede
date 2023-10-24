@@ -236,31 +236,20 @@ app.post('/webhook(/pix)?', async (req, res) => {
   try {
     const { pix } = req.body;
 
-    // Verifique se há notificações no campo "pix"
     if (pix && pix.length > 0) {
       for (const notification of pix) {
         const { txid } = notification;
-        console.log("Webhook received txid:", txid); // Registre o txid recebido
+        console.log("Webhook received txid:", txid);
 
-        // Verifique se o txid existe na tabela 'transactions'
-        const checkQuery = "SELECT txid FROM transactions WHERE txid = $1";
-        const { rows } = await pgClientCodeburguer.query(checkQuery, [txid]);
-        console.log("Webhook received rows:", rows); // Registre o txid recebido
+        const updateQuery = `
+          UPDATE orders
+          SET status_payment = true
+          WHERE txid = $1;
+        `;
 
-        if (rows.length > 0) {
-          // Se o txid existe na tabela 'transactions', atualize o 'status_payment' para 'true' na tabela 'orders'
-          const updateQuery = `
-            UPDATE orders
-            SET status_payment = true
-            WHERE txid = $1; 
-          `;
-
-          const result = await pgClientCodeburguer.query(updateQuery, [txid]);
-          console.log(`Status atualizado para 'true' para txid: ${txid}`);
-          console.log("Update result:", result.rows); // Adicione um log do resultado da atualização
-        } else {
-          console.error(`txid não encontrado na tabela "transactions".`);
-        }
+        const result = await pgClientCodeburguer.query(updateQuery, [txid]);
+        console.log(`Status atualizado para 'true' para txid: ${txid}`);
+        console.log("Update result:", result.rows);
       }
     }
 
