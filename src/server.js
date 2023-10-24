@@ -236,18 +236,27 @@ app.get("/pix", async (req, res) => {
 
 app.post('/webhook(/pix)?', async (req, res) => {
   try {
-    const { txid } = req.body; // Suponha que o txid da transação seja enviado no corpo da solicitação POST
+    const { pix } = req.body;
 
-    // Atualize o status_payment no registro da tabela orders correspondente ao txid atual
-    const updateQuery = `
-      UPDATE orders
-      SET status_payment = true
-      WHERE txid = $1;
-    `;
+    // Certifique-se de que há notificações no campo "pix"
+    if (pix && pix.length > 0) {
+      const txid = pix[0].txid; // Obtenha o txid da primeira notificação
 
-    await pgClientCodeburguer.query(updateQuery, [txid]);
+      if (!txid) {
+        return res.status(400).json({ error: 'O txid é obrigatório no corpo da solicitação.' });
+      }
 
-    console.log(`Status atualizado para 'true' para txid: ${txid}`);
+      // Atualize o status_payment no registro da tabela orders correspondente ao txid atual
+      const updateQuery = `
+        UPDATE orders
+        SET status_payment = true
+        WHERE txid = $1;
+      `;
+
+      await pgClientCodeburguer.query(updateQuery, [txid]);
+
+      console.log(`Status atualizado para 'true' para txid: ${txid}`);
+    }
 
     res.status(200).end();
   } catch (error) {
