@@ -27,14 +27,14 @@ app.use(cors()); // Isso permitirá todas as origens
 // });
 // pgClient.connect(); // Conectando ao banco de dados
 
-// const pgClientCodeburguer = new Client({
-//   user: "postgres",
-//   host: "localhost",
-//   database: "codeburguer",
-//   password: "1234",
-//   port: 5432,
-// });
-// pgClientCodeburguer.connect();
+const pgClientCodeburguer = new Client({
+  user: "postgres",
+  host: "localhost",
+  database: "codeburguer",
+  password: "1234",
+  port: 5432,
+});
+pgClientCodeburguer.connect();
 
 
 
@@ -52,18 +52,18 @@ app.use(cors()); // Isso permitirá todas as origens
 // pgClient.connect(); // Conectando ao banco de dados
 
 
-//Criando um cliente para conexão com o PostgreSQL
-const pgClientCodeburguer = new Client({
-  user: "codeburguer",
-  host: "codeburguer.ckymwbkfxdvf.sa-east-1.rds.amazonaws.com",
-  database: "codeburguer",
-  password: "12341234",
-  port: 5432, // Porta padrão do PostgreSQL
-  ssl: {
-    rejectUnauthorized: false, // Desativa a verificação do certificado
-  },
-});
-pgClientCodeburguer.connect(); // Conectando ao banco de dados
+// //Criando um cliente para conexão com o PostgreSQL
+// const pgClientCodeburguer = new Client({
+//   user: "codeburguer",
+//   host: "codeburguer.ckymwbkfxdvf.sa-east-1.rds.amazonaws.com",
+//   database: "codeburguer",
+//   password: "12341234",
+//   port: 5432, // Porta padrão do PostgreSQL
+//   ssl: {
+//     rejectUnauthorized: false, // Desativa a verificação do certificado
+//   },
+// });
+// pgClientCodeburguer.connect(); // Conectando ao banco de dados
 
 
 
